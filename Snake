@@ -1,0 +1,160 @@
+#include <iostream>
+#include <windows.h>
+#include <unistd.h>
+#include <conio.h>
+#include <stdio.h>
+#include <dos.h>
+
+bool endgame;
+const int ngang = 25;
+const int doc = 15;
+int x,y,foodX,foodY,score,tailX[20],tailY[20],ltail;
+enum Direction
+{
+	stop=0,
+	RIGHT,
+	LEFT,
+	DOWN,
+	UP,
+};
+Direction move;
+void Init()
+{
+	endgame = false;
+	move=stop;
+	x= ngang/2;
+	y= doc/2;
+	foodX=rand() % ngang;
+	foodY=rand() % doc;
+	score = 0;
+}
+void Draw()
+{
+	int i,j,k,cd;
+	bool kt;
+	system("cls");
+	for (i=0;i<ngang+2;i++)
+	{
+		printf("x");
+	}
+	printf("\n");
+	for (i=0;i<doc;i++)
+	{
+		for (j=0;j<ngang;j++)
+		{
+			if (j == 0)
+				printf("x");
+				if (j==x && i==y)
+					printf("*");
+				else
+				if ((j==foodX) && (i==foodY))
+					printf("o");
+				else
+				{
+					kt=false;
+					for (k=0;k < ltail; k++)
+					{
+						if ((tailX[k] == j) && (tailY[k]==i))
+						{
+							printf("*");
+							kt = true;
+						}
+					}
+					if (kt!=true)
+					printf(" ");
+				}
+			if (j==ngang - 1)
+				printf("x");
+		}
+		printf("\n");
+	}
+	for (i=0;i<ngang+2;i++)
+	{
+		printf("x");
+	}
+	printf("\n\n");
+	printf("Your score: %d\n",score);
+}
+void Input()
+{
+	if (_kbhit())
+	{
+		switch (_getch())
+		{
+			case 'a':
+				move = LEFT;
+				break;
+			case 'd':
+				move = RIGHT;
+				break;
+			case'w':
+				move = UP;
+				break;
+			case 's':
+				move = DOWN;
+				break;
+		}
+	}
+}
+
+void logic()
+{
+	int preX=tailX[0],preY=tailY[0],pre2X,pre2Y,i;
+		tailX[0]=x;
+		tailY[0]=y;
+		for (i=1;i<ltail;i++)
+		{
+			pre2X = tailX[i];
+			pre2Y = tailY[i];
+			tailX[i] = preX;
+			tailY[i] = preY;
+			preX = pre2X;
+			preY = pre2Y;
+		}
+	switch (move)
+	{
+		case LEFT:
+		x=x-1;
+		break;
+		case RIGHT:
+		x=x+1;
+		break;
+		case UP:
+		y=y-1;
+		break;
+		case DOWN:
+		y=y+1;
+		break;
+		default:
+			break;
+	}
+	if ((x>ngang) || (x<0) || (y>doc) || (y<0))
+		endgame=true;
+	if ((x==foodX) && (y==foodY) )
+	{
+		score=score+1;
+		ltail=ltail+1;
+		foodX=rand() % ngang;
+		foodY=rand() % doc;
+	}
+}
+
+int main()
+{
+	Init();
+	while (endgame!=true)
+	{
+		Draw();
+		Input();
+		logic();
+		Sleep(100);
+	}
+	if (endgame == true)
+	{
+	    system("cls");
+	    printf("GAME OVER!\n");
+	    printf("YOUR SCORE IS %d",score);
+	}
+
+
+}
